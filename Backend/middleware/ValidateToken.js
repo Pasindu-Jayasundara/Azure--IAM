@@ -1,32 +1,53 @@
-import { TokenValidator } from "@azure/msal-node";
+import jwt from "jsonwebtoken";
+import jwksRsa from "jwks-rsa";
 import dotenv from "dotenv";
 dotenv.config();
 
-// Initialize the official Microsoft Token Validator
-const tokenValidator = new TokenValidator({
-  auth: {
-    clientId: process.env.CLIENT_ID,
-    authority: `https://microsoftonline.com/${process.env.TENANT_ID}`
-  }
+// 1. Configure the JWKS client to fetch Microsoft Entra ID's public signing keys
+const jwksClient = jwksRsa({
+  cache: true,
+  rateLimit: true,
+  jwksRequestsPerMinute: 5,
+  jwksUri: `https://login.microsoftonline.com/${process.env.TENANT_ID}/discovery/v2.0/keys`
 });
 
-// Authentication Middleware
-export async function validateEntraToken(req, res, next) {
+// Helper function to dynamically retrieve the specific signing key for a token header
+function getKey(header, callback) {
+  jwksClient.getSigningKey(header.kid, (err, key) => {
+    if (err) {
+      return callback(err);
+    }
+    const signingKey = key.getPublicKey();
+    callback(null, signingKey);
+  });
+}
+
+// 2. Middleware to extract and validate the Microsoft Entra ID token
+export function validateEntraToken(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized: Missing token' });
   }
 
-  const rawToken = authHeader.split(' ')[1];
+  const token = authHeader.split(' ')[1];
 
-  try {
-    // Cryptographically validates signature, expiration, issuer, and audience
-    const validatedToken = await tokenValidator.validateAccessToken(rawToken);
-    
-    // Attach the validated claims (including roles) to the request object
-    req.authClaims = validatedToken.claims;
-    next();
-  } catch (error) {
-    return res.status(401).json({ error: 'Unauthorized: Invalid token', details: error.message });
-  }
+  // Verify signature, expiration, issuer, and audience
+  jwt.verify(
+    token, 
+    getKey, 
+    {
+      audience: process.env.CLIENT_ID,
+      issuer: `https://login.microsoftonline.com/${process.env.TENANT_ID}/v2.0`,
+      algorithms: ['RS256']
+    }, 
+    (err, decodedToken) => {
+      if (err) {
+        return res.status(401).json({ error: 'Unauthorized: Invalid token', details: err.message });
+      }
+
+      // Attach decoded Entra claims (like roles, name, oid) to the request object
+      req.authClaims = decodedToken;
+      next();
+    }
+  );
 }

@@ -1,50 +1,73 @@
 import { useMsal } from "@azure/msal-react";
+import { useState } from "react";
+import { loginRequest } from "../config/authConfig";
 
 function Dashboard() {
-    const { accounts } = useMsal();
+    const { accounts, instance } = useMsal();
     const activeAccount = accounts[0];
+    const [requestState, setRequestState] = useState({ status: "idle", result: null });
 
     // Read the secure token payload claims sent back from Azure Identity Platform
     const userRoles = activeAccount?.idTokenClaims?.roles || [];
     
-    // Evaluate application permissions locally
-    const isAdmin = userRoles.includes("ADMIN");
-    const isManager = userRoles.includes("MANAGER");
+    const handleBackendRequest = async () => {
+        setRequestState({ status: "loading", result: null });
+
+        try {
+
+            const tokenResponse = await instance.acquireTokenSilent({ ...loginRequest, account: activeAccount });
+            console.log("Active account:", tokenResponse.accessToken);
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/secure-data`, {
+                headers: { Authorization: `Bearer ${tokenResponse.accessToken}` },
+            });
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || "The backend request was not successful.");
+            }
+
+            setRequestState({ status: "success", result });
+        } catch (error) {
+            setRequestState({ status: "error", result: { error: error.message } });
+        }
+    };
 
     return (
-        <div style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '6px' }}>
-            <h3>Welcome back, {activeAccount?.name}!</h3>
-            <p><strong>Principal Name:</strong> {activeAccount?.username}</p>
-            <p><strong>Identity Token Roles Claim:</strong> {userRoles.length > 0 ? userRoles.join(', ') : 'None'}</p>
-            
-            <hr style={{ margin: '20px 0' }} />
-
-            {/* Manager and Admin Component Layer */}
-            {(isManager || isAdmin) ? (
-                <div style={{ background: '#e2f0d9', padding: '15px', margin: '10px 0', borderRadius: '4px' }}>
-                    <h4>📊 Manager Operational Data Grid</h4>
-                    <p>Access Granted. You have application validation permissions to review operational metrics.</p>
+        <main className="dashboard">
+            <section className="dashboard-heading">
+                <div>
+                    <span className="eyebrow">ACCOUNT OVERVIEW</span>
+                    <h1>Welcome back, {activeAccount?.name || "there"}.</h1>
+                    <p className="dashboard-intro">Your verified identity and workspace access, in one place.</p>
                 </div>
-            ) : (
-                <p style={{ color: 'red' }}>⚠️ Access Denied: Your identity profile has no valid app role assignment.</p>
-            )}
-
-            {/* Admin Only Component Layer */}
-            {isAdmin ? (
-                <div style={{ background: '#fce4d6', padding: '15px', margin: '10px 0', borderRadius: '4px', border: '1px solid #f4b084' }}>
-                    <h4>🛡️ System Administrative Console</h4>
-                    <p>Elevated Access Level Validated.</p>
-                    <button onClick={() => alert("Simulating structural cloud mutations...")} style={{ background: '#d83b01', color: 'white', border: 'none', padding: '8px 12px', cursor: 'pointer', borderRadius: '4px' }}>
-                        Flush App Caches (Admin Action)
-                    </button>
+                <span className="status-pill"><span />Authenticated</span>
+            </section>
+            <section className="identity-grid">
+                <div className="identity-card">
+                    <span className="card-label">IDENTITY DETAILS</span>
+                    <div className="detail-row"><span>Name</span><strong>{activeAccount?.name || "Not available"}</strong></div>
+                    <div className="detail-row"><span>Username</span><strong>{activeAccount?.username || "Not available"}</strong></div>
+                    <div className="detail-row"><span>Role</span><strong>{userRoles.length > 0 ? userRoles.join(", ") : "No role assigned"}</strong></div>
                 </div>
-            ) : (
-                <div style={{ background: '#eee', padding: '15px', margin: '10px 0', borderRadius: '4px', color: '#666' }}>
-                    <h4>🔒 Administrative Console (Locked)</h4>
-                    <p>Requires an account possessing the <strong>Admin</strong> application claim.</p>
+                <div className="placeholder-card">
+                    <span className="card-label">NEXT IN THE WORKSPACE</span>
+                    <h2>More functionality will live here.</h2>
+                    <p>This space is reserved for future workspace features.</p>
                 </div>
-            )}
-        </div>
+            </section>
+            <section className="request-panel">
+                <div>
+                    <span className="card-label">BACKEND CONNECTION</span>
+                    <h2>Request secure data</h2>
+                    <p>Send an authenticated request to the backend and view its response here.</p>
+                </div>
+                <button className="request-button" onClick={handleBackendRequest} disabled={requestState.status === "loading"}>
+                    {requestState.status === "loading" ? "Requesting..." : "Send request"}
+                    <span aria-hidden="true">-&gt;</span>
+                </button>
+                {requestState.result && <pre className={`request-result ${requestState.status}`}>{JSON.stringify(requestState.result, null, 2)}</pre>}
+            </section>
+        </main>
     );
 }
 

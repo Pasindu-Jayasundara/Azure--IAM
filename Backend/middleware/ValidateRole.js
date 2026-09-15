@@ -1,7 +1,7 @@
 // Role Authorization Middleware
 export function checkRole(requiredRole) {
   return (req, res, next) => {
-    // Entra ID stores assigned App Roles inside the 'roles' array claim
+    // Entra ID populates assigned App Roles inside the 'roles' array claim
     const roles = req.authClaims && req.authClaims.roles;
 
     if (roles && roles.includes(requiredRole)) {

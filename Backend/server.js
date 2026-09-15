@@ -1,8 +1,8 @@
 import cors from "cors";
 import express from "express";
 import dotenv from "dotenv";
-import { validateEntraToken } from "./middleware/ValidateToken";
-import { checkRole } from "./middleware/ValidateRole";
+import { validateEntraToken } from "./middleware/ValidateToken.js";
+import { checkRole } from "./middleware/ValidateRole.js";
 
 dotenv.config();
 
@@ -15,10 +15,10 @@ app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
 
-// Example Protected Route
-app.get('/api/secure-data', validateEntraToken, checkRole('Admin'), (req, res) => {
+// admin Protected Route
+app.get('/api/admin-data', validateEntraToken, checkRole('Admin'), (req, res) => {
   res.json({ 
-    message: "Authorized!", 
+    message: "Access granted!", 
     user: req.authClaims.name 
   });
 });
