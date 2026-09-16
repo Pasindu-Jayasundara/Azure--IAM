@@ -13,6 +13,7 @@ export const SignInButton = () => {
                     scopes: loginRequest.scopes,
                     redirectUri: import.meta.env.VITE_POPUP_REDIRECT_URI,
                 });
+                console.log("Microsoft popup sign-in successful", response);
                 if (response.account) {
                     instance.setActiveAccount(response.account);
                 }

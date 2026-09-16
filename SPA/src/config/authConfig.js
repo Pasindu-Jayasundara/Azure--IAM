@@ -28,3 +28,7 @@ export const loginRequest = {
 export const graphConfig = {
     graphMeEndpoint: "https://graph.microsoft.com/v1.0/me" //e.g. https://graph.microsoft.com/v1.0/me
 };
+
+export const tokenRequest = {
+    scopes: ["api://9ef56e2f-efac-4517-8589-5baaf36fe9f2/access_as_user"]
+};

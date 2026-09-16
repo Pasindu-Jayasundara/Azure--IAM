@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
 });
 
 // admin Protected Route
-app.get('/api/admin-data', validateEntraToken, checkRole('Admin'), (req, res) => {
+app.get('/api/admin-data', validateEntraToken, checkRole('ADMIN'), (req, res) => {
   res.json({ 
     message: "Access granted!", 
     user: req.authClaims.name 
