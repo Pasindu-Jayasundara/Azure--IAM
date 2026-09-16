@@ -50,14 +50,16 @@ button { font: inherit; }
 .detail-row span { color: var(--muted); font-size: 12px; text-transform: uppercase; }
 .detail-row strong { font-size: 14px; overflow-wrap: anywhere; text-align: right; }
 .placeholder-card { border-left: 4px solid var(--red); }
-.placeholder-card h2, .request-panel h2 { font-size: 24px; margin: 18px 0 8px; }
-.placeholder-card p, .request-panel p { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0; }
-.request-panel { display: grid; gap: 22px; grid-template-columns: 1fr auto; margin-top: 20px; }
-.request-button { align-self: center; background: var(--black); border: 0; border-radius: 4px; color: var(--white); cursor: pointer; font-size: 13px; font-weight: 700; padding: 12px 16px; }
+.placeholder-card h2, .request-card h2, .request-section h2 { font-size: 24px; margin: 18px 0 8px; }
+.placeholder-card p, .request-card p, .request-section-copy { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0; }
+.request-section { margin-top: 34px; }
+.request-grid { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; margin-top: 18px; }
+.request-card { border: 1px solid var(--border); padding: 24px; }
+.request-button { background: var(--black); border: 0; border-radius: 4px; color: var(--white); cursor: pointer; font-size: 13px; font-weight: 700; margin-top: 22px; padding: 12px 16px; }
 .request-button:hover { background: var(--blue); }
 .request-button:disabled { cursor: wait; opacity: .6; }
 .request-button span { margin-left: 14px; }
-.request-result { background: var(--black); color: var(--white); font: 12px/1.5 Consolas, monospace; grid-column: 1 / -1; margin: 0; overflow-x: auto; padding: 16px; white-space: pre-wrap; }
+.request-result { background: var(--black); color: var(--white); font: 12px/1.5 Consolas, monospace; margin: 18px 0 0; overflow-x: auto; padding: 16px; white-space: pre-wrap; }
 .request-result.error { color: #ff8075; }
 @media (max-width: 700px) {
   .app-navbar { padding: 16px 20px; }
@@ -65,6 +67,5 @@ button { font: inherit; }
   .dashboard-heading { align-items: flex-start; display: block; }
   .status-pill { margin-top: 20px; width: fit-content; }
   .dashboard-heading h1 { font-size: 30px; }
-  .identity-grid, .request-panel { grid-template-columns: 1fr; }
-  .request-button { justify-self: start; }
+  .identity-grid, .request-grid { grid-template-columns: 1fr; }
 }

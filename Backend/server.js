@@ -15,11 +15,20 @@ app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
 
-// admin Protected Route
+// Role-protected routes
 app.get('/api/admin-data', validateEntraToken, checkRole('ADMIN'), (req, res) => {
-  res.json({ 
-    message: "Access granted!", 
-    user: req.authClaims.name 
+  res.json({
+    message: "Admin endpoint access granted!",
+    endpoint: "/api/admin-data",
+    user: req.authClaims.name,
+  });
+});
+
+app.get('/api/manager-data', validateEntraToken, checkRole('MANAGER'), (req, res) => {
+  res.json({
+    message: "Manager endpoint access granted!",
+    endpoint: "/api/manager-data",
+    user: req.authClaims.name,
   });
 });
 
