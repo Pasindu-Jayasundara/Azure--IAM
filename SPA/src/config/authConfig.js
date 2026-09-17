@@ -1,9 +1,10 @@
+const clientId = import.meta.env.VITE_CLIENT_ID;
+const tenantId = import.meta.env.VITE_TENANT_ID;
+
 export const msalConfig = {
     auth: {
-        clientId: "9ef56e2f-efac-4517-8589-5baaf36fe9f2",
-        authority: "https://login.microsoftonline.com/b486d071-a8d2-4476-b2f7-be3757f17963",
-        // redirectUri: "http://localhost:5173",
-        // popupRedirectUri: "http://localhost:5173/redirect.html",
+        clientId: clientId,
+        authority: `https://login.microsoftonline.com/${tenantId}`,
     },
     cache: {
         cacheLocation: "sessionStorage", // This configures where your cache will be stored
@@ -30,5 +31,5 @@ export const graphConfig = {
 };
 
 export const tokenRequest = {
-    scopes: ["api://9ef56e2f-efac-4517-8589-5baaf36fe9f2/access_as_user"]
+    scopes: [`api://${clientId}/access_as_user`]
 };
