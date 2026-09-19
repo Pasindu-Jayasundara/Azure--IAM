@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import jwksRsa from "jwks-rsa";
+import jwksRsa from "jwks-rsa"; // retrieve and cache public keys from a JWKS (JSON Web Key Set) endpoint
 import dotenv from "dotenv";
 dotenv.config();
 

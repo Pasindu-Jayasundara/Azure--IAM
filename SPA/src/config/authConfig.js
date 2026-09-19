@@ -17,6 +17,22 @@ export const msalConfig = {
  * By default, MSAL.js will add OIDC scopes (openid, profile, email) to any login request.
  * For more information about OIDC scopes, visit: 
  * https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#openid-connect-scopes
+ * 
+ * Scope	            What it allows
+    User.Read	            Read the signed-in user's basic profile
+    User.ReadBasic.All	    Read basic profiles of other users
+    User.Read.All	        Read full profiles of users in the organization
+    User.ReadWrite	        Read/update the signed-in user's profile
+    Mail.Read	            Read the signed-in user's email
+    Mail.ReadWrite	        Read, create, update and delete the user's email
+    Mail.Send	            Send email as the signed-in user
+    Calendars.Read	        Read the user's calendars
+    Calendars.ReadWrite	    Create, read, update and delete calendar events
+    Files.Read	            Read files the user can access
+    Files.ReadWrite	        Read and modify files the user can access
+    Sites.Read.All	        Read SharePoint sites the user can access
+    Contacts.Read	        Read the user's contacts
+    Chat.Read	            Read Teams chats available to the user
  */
 export const loginRequest = {
     scopes: ["User.Read"]
